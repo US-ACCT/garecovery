@@ -3,12 +3,14 @@ from io import BytesIO
 
 import base64
 
+from garecovery import exceptions
 from . import gaconstants, txutil, h2b
 import wallycore as wally
 
 
 def _fernet_decrypt(key, data):
-    assert wally.hmac_sha256(key[:16], data[:-32]) == data[-32:]
+    if wally.hmac_sha256(key[:16], data[:-32]) != data[-32:]:
+        raise exceptions.GARecoveryError('Invalid nlocktime data')
     res = wally.aes_cbc(key[16:], data[9:25], data[25:-32], wally.AES_FLAG_DECRYPT)
     return res
 

@@ -75,6 +75,19 @@ def test_standard_segwit():
     assert summary[0]['destination address'] == 'momxJW75A8PoiiJhCPGmiC4rTsE7yGLVyh'
 
 
+@mock.patch('garecovery.bitcoincore.AuthServiceProxy', None)
+def test_mnemonic_nlocktime_mismatch():
+    """Use the wrong mnemonic for the nlocktime"""
+    output = get_output([
+        '--mnemonic-file={}'.format(datafile('mnemonic_1.txt')), # should be mnemonic_4.txt
+        '--show-summary',
+        '2of2',
+        '--network=testnet',
+        '--nlocktime-file={}'.format(datafile('nlocktimes_1.zip')),
+    ], expect_error=True)
+    assert 'Invalid nlocktime data' in output
+
+
 def do_test_standard_summary(nlocktimes_filename):
     output, ofiles = get_output_ex([
         '--mnemonic-file={}'.format(datafile('mnemonic_1.txt')),
