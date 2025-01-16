@@ -39,13 +39,14 @@ def wallet_from_mnemonic(mnemonic_or_hex_seed, passphrase, ver=wally.BIP32_VER_M
 def _decrypt_mnemonic(mnemonic, password):
     """Decrypt a 27 word encrypted mnemonic to a 24 word mnemonic"""
     mnemonic = ' '.join(mnemonic.split())
-    entropy = bytearray(wally.BIP39_ENTROPY_LEN_288)
-    assert wally.bip39_mnemonic_to_bytes(None, mnemonic, entropy) == len(entropy)
+    entropy = wally.bip39_mnemonic_to_bytes(None, mnemonic)
+    assert len(entropy) == wally.BIP39_ENTROPY_LEN_288
     salt, encrypted = entropy[32:], entropy[:32]
     derived = bytearray(64)
     wally.scrypt(password.encode('utf-8'), salt, 16384, 8, 8, derived)
-    key, decrypted = derived[32:], bytearray(32)
-    wally.aes(key, encrypted, wally.AES_FLAG_DECRYPT, decrypted)
+    key = derived[32:]
+    decrypted = wally.aes(key, encrypted, wally.AES_FLAG_DECRYPT)
+    assert len(decrypted) == 32
     for i in range(len(decrypted)):
         decrypted[i] ^= derived[i]
     if wally.sha256d(decrypted)[:4] != salt:

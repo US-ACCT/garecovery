@@ -9,10 +9,8 @@ import wallycore as wally
 
 def _fernet_decrypt(key, data):
     assert wally.hmac_sha256(key[:16], data[:-32]) == data[-32:]
-    res = bytearray(len(data[25:-32]))
-    written = wally.aes_cbc(key[16:], data[9:25], data[25:-32], wally.AES_FLAG_DECRYPT, res)
-    assert written <= len(res) and len(res) - written <= wally.AES_BLOCK_LEN
-    return res[:written]
+    res = wally.aes_cbc(key[16:], data[9:25], data[25:-32], wally.AES_FLAG_DECRYPT)
+    return res
 
 
 def _unzip(data, key):
