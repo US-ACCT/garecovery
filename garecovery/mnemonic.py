@@ -24,8 +24,7 @@ def seed_from_mnemonic(mnemonic_or_hex_seed, passphrase):
         seed = h2b(mnemonic_or_hex_seed[:-1])
     else:
         mnemonic = mnemonic_or_hex_seed
-        written, seed = wally.bip39_mnemonic_to_seed512(mnemonic_or_hex_seed, passphrase)
-        assert written == wally.BIP39_SEED_LEN_512
+        seed = wally.bip39_mnemonic_to_seed512(mnemonic_or_hex_seed, passphrase)
 
     assert len(seed) == wally.BIP39_SEED_LEN_512
     return seed, mnemonic
